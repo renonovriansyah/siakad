@@ -1,0 +1,75 @@
+/* ==========================================================
+// File: css/style.css
+// Fungsi: Layout, Transisi Sidebar, Hover Cards
+// ========================================================== */
+
+:root {
+    --sidebar-bg: #212529;
+    --card-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Struktur Dasar dan Transisi Sidebar (PENTING UNTUK LAYOUT) */
+body {
+    overflow-x: hidden;
+    background-color: #f4f7f6;
+}
+
+#wrapper {
+    display: flex; /* Memastikan sidebar dan konten berdampingan */
+    transition: all 0.5s ease; 
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 250px; 
+    position: fixed; /* Membuat sidebar tetap di kiri */
+    z-index: 1000;
+    transition: margin-left 0.5s ease; 
+}
+
+#page-content-wrapper {
+    width: 100%;
+    margin-left: 250px; /* Konten dimulai setelah lebar sidebar */
+    transition: margin-left 0.5s ease; 
+}
+
+/* KETIKA SIDEBAR SEMBUNYI (Toggled) */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -250px; 
+}
+
+#wrapper.toggled #page-content-wrapper {
+    margin-left: 0; 
+}
+
+/* Efek Hover Sidebar Menu */
+.list-group-item {
+    border: none !important;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #343a40 !important;
+    transform: translateX(5px);
+}
+
+/* Efek Hover Card Statistik */
+.stat-card {
+    border-left: 5px solid transparent;
+    transition: all 0.3s ease; 
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    border-left-color: #0d6efd;
+    box-shadow: var(--card-hover-shadow) !important;
+    transform: translateY(-5px); 
+}
+
+.admin-rpl-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #343a40;
+}
