@@ -553,25 +553,38 @@ async function loadMataKuliahToDropdowns() {
  */
 async function loadStatistikDashboard() {
     try {
-        // Ambil Elemen Statistik dengan menargetkan kelas dan urutan anak (nth-child)
+        // Ambil Elemen Statistik (Pastikan ini menargetkan H3 class="stat-value")
         const totalMhsEl = document.querySelector('.stat-card:nth-child(1) .stat-value');
         const totalMkEl = document.querySelector('.stat-card:nth-child(2) .stat-value');
-        const totalNilaiEl = document.querySelector('.stat-card:nth-child(3) .stat-value');
+        // Kartu ke-3: Tugas Belum Dinilai/Total Nilai
+        const totalNilaiEl = document.querySelector('.stat-card:nth-child(3) .stat-value'); 
+        const rataRataIPKEl = document.querySelector('.stat-card:nth-child(4) .stat-value');
         
-        // Ambil Data dari data-service.js (Harus sudah merefaktor fungsi di logic.js)
-        const totalMahasiswa = await dataService.getTotalDokumen(COLLECTION_MAHASISWA);
-        const totalMataKuliah = await dataService.getTotalDokumen(COLLECTION_MK);
-        const totalNilai = await dataService.getTotalDokumen(COLLECTION_NILAI);
+        // KRITIS: Panggil fungsi baru dari data-service
+        const stats = await dataService.getDashboardStatistics();
 
-        // Update Teks
-        if(totalMhsEl) totalMhsEl.textContent = totalMahasiswa;
-        if(totalMkEl) totalMkEl.textContent = totalMataKuliah;
-        if(totalNilaiEl) totalNilaiEl.textContent = totalNilai;
+        console.log("--- DEBUG STATS ---");
+        console.log("Total Mahasiswa (DB):", stats.totalMahasiswa);
+        console.log("Total Mata Kuliah (DB):", stats.totalMataKuliahAktif); // <--- LIHAT NILAI INI
+        console.log("Total Data Nilai (DB):", stats.totalDataNilai);
+        console.log("IPK Dihitung:", stats.rataRataIPK);
+        console.log("-------------------");
+
+        // 1. Update Kartu Total Mahasiswa
+        if(totalMhsEl) totalMhsEl.textContent = stats.totalMahasiswa;
         
-        // Catatan: Kartu ke-4 (Rata-rata IPK) dipertahankan dummy karena perhitungan kompleks.
+        // 2. Update Kartu Mata Kuliah Aktif
+        if(totalMkEl) totalMkEl.textContent = stats.totalMataKuliahAktif;
+        
+        // 3. Update Kartu Total Data Nilai (Menggantikan Tugas Belum Dinilai)
+        if(totalNilaiEl) totalNilaiEl.textContent = stats.totalDataNilai;
+        
+        // 4. Update Kartu Rata-rata IPK
+        // Karena hitungRataRataIPK mengembalikan string 'X.XX', kita tampilkan langsung
+        if(rataRataIPKEl) rataRataIPKEl.textContent = stats.rataRataIPK; 
         
     } catch (error) {
-        console.error("Gagal memuat statistik dashboard: ", error);
+        console.error("Gagal memuat statistik dashboard:", error);
     }
 }
 
