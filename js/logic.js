@@ -16,6 +16,16 @@ const tabelDataMK = document.getElementById('tabelDataMK');
 const notifikasiMK = document.getElementById('notifikasiMK');
 const loadingStatusMK = document.getElementById('loadingStatusMK');
 
+// --- ELEMEN LOGIN ---
+const loginForm = document.getElementById('loginForm');
+const loginMessage = document.getElementById('loginMessage');
+const AUTH_KEY = 'adminLoggedIn';
+const ADMIN_COLLECTION = 'admins';
+
+function displayLoginMessage(message, type = 'alert-danger') {
+    if (!loginMessage) return;
+    loginMessage.innerHTML = `<div class="alert ${type}">${message}</div>`;
+}
 
 /**
  * Fungsi pembantu untuk menampilkan pesan notifikasi di halaman Input Lengkap.
@@ -81,6 +91,86 @@ function validasiInputLengkap() {
     };
 }
 
+/**
+ * Cek Username dan Password di Firestore
+ */
+async function checkAdminCredentials(username, password) {
+    try {
+        // Ambil dokumen di koleksi admins dengan ID yang sesuai dengan username
+        const doc = await db.collection(ADMIN_COLLECTION).doc(username).get();
+
+        if (doc.exists) {
+            const adminData = doc.data();
+            
+            // Verifikasi password (perbandingan string sederhana, bukan praktik terbaik untuk produksi!)
+            if (adminData.password === password) {
+                return true; // Login berhasil
+            }
+        }
+        return false; // Login gagal
+    } catch (error) {
+        console.error("Error saat cek kredensial:", error);
+        return false;
+    }
+}
+
+
+/**
+ * Event Listener untuk Form Login
+ */
+if (loginForm) {
+    loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('inputUsername').value.trim();
+        const password = document.getElementById('inputPassword').value.trim();
+
+        displayLoginMessage('Memproses...', 'alert-info');
+
+        const success = await checkAdminCredentials(username, password);
+
+        if (success) {
+            // 1. Simpan status login di Session Storage
+            sessionStorage.setItem(AUTH_KEY, 'true'); 
+            displayLoginMessage('Login berhasil! Mengalihkan...', 'alert-success');
+            
+            // 2. Alihkan ke Dashboard
+            window.location.href = 'index.html';
+
+        } else {
+            sessionStorage.removeItem(AUTH_KEY);
+            displayLoginMessage('Username atau Password salah.', 'alert-danger');
+        }
+    });
+}
+
+/**
+ * Cek apakah user sudah login. Jika belum, alihkan ke halaman login.
+ */
+function checkAuthentication() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const isLoggedIn = sessionStorage.getItem(AUTH_KEY) === 'true';
+
+    // Jika user belum login DAN bukan di halaman login, alihkan.
+    if (!isLoggedIn && currentPage !== 'login.html') {
+        window.location.href = 'login.html';
+        return false;
+    } 
+    // Jika user sudah login DAN berada di halaman login, alihkan ke dashboard.
+    if (isLoggedIn && currentPage === 'login.html') {
+        window.location.href = 'index.html';
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Log out user dan alihkan ke halaman login.
+ */
+function handleLogout() {
+    sessionStorage.removeItem(AUTH_KEY);
+    window.location.href = 'login.html';
+}
 
 /**
  * Menyimpan data nilai mahasiswa ke Firebase Firestore (fungsi re-usable).
@@ -630,14 +720,15 @@ async function handleEditMK(kode_mk) {
 // INISIALISASI SAAT DOM CONTENT LOADED
 // ====================================================================
 document.addEventListener("DOMContentLoaded", function() {
-    // Cek apakah ini halaman Dashboard (index.html)
-    if (document.getElementById('dataNilaiTerbaru')) {
-        loadDataNilaiDashboard();
-        loadStatistikDashboard();
-    }
-    
-    // Cek apakah ini halaman Input Nilai (inputnilai.html)
-    if (document.getElementById('inputMataKuliahLengkap')) {
-        loadMataKuliahToDropdowns(); 
+    if (checkAuthentication()) {
+        if (document.getElementById('dataNilaiTerbaru')) {
+            loadDataNilaiDashboard();
+            loadStatistikDashboard();
+        }
+        
+        // Cek apakah ini halaman Input Nilai (inputnilai.html)
+        if (document.getElementById('inputMataKuliahLengkap')) {
+            loadMataKuliahToDropdowns(); 
+        }
     }
 });

@@ -15,6 +15,9 @@ firebase.initializeApp(firebaseConfig);
 // Dapatkan referensi ke Firestore
 const db = firebase.firestore();
 
+// Dapatkan referensi ke Firebase Auth
+const auth = firebase.auth();
+
 // Nama Koleksi
 const COLLECTION_NILAI = "nilai_mahasiswa";
 const COLLECTION_MAHASISWA = "data_mahasiswa";
