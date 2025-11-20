@@ -271,6 +271,7 @@ async function loadSemuaMahasiswa() {
             // Tombol Aksi (Hapus)
             const cellAksi = row.insertCell(3);
             cellAksi.innerHTML = `
+                <button class="btn btn-sm btn-info me-2" onclick="handleEditMahasiswa('${docId}')" style="color:white;">Edit</button>
                 <button class="btn btn-sm btn-danger me-2" onclick="handleHapusMahasiswa('${docId}')">Hapus</button>
                 `;
         });
@@ -296,31 +297,35 @@ if (formMahasiswa) {
         const nama = document.getElementById('inputNamaMahasiswa').value.trim();
         const prodi = document.getElementById('inputProdiMahasiswa').value.trim();
 
-        tampilkanNotifikasiMahasiswa('', 'alert-danger', true); // Bersihkan notifikasi
+        tampilkanNotifikasiMahasiswa('', 'alert-danger', true); 
 
         if (!nim || !nama || !prodi) {
             tampilkanNotifikasiMahasiswa('Semua field wajib diisi!', 'alert-danger');
             return;
         }
 
-        if (!/^\d{7,}$/.test(nim)) {
+        // Validasi NIM hanya jika BUKAN mode EDIT (karena di mode edit, nim readonly)
+        if (!/^\d{7,}$/.test(nim) && !dataMahasiswaUntukEdit) { 
             tampilkanNotifikasiMahasiswa('Format NIM tidak valid. Harus berupa angka dengan minimal 7 digit.', 'alert-danger');
             return;
         }
-
+        
         const dataMahasiswa = { nim, nama, prodi };
 
         try {
+            // dataService.simpanMahasiswa menangani INSERT (jika NIM baru) atau UPDATE (jika NIM sudah ada)
             await dataService.simpanMahasiswa(dataMahasiswa); 
             
-            tampilkanNotifikasiMahasiswa('✅ Data mahasiswa berhasil disimpan!', 'alert-success');
-            formMahasiswa.reset();
+            const pesan = dataMahasiswaUntukEdit ? '✅ Data mahasiswa berhasil diupdate!' : '✅ Data mahasiswa berhasil disimpan!';
+
+            tampilkanNotifikasiMahasiswa(pesan, 'alert-success');
+            resetFormMahasiswa(); // Reset form dan tombol
             loadSemuaMahasiswa(); // Muat ulang tabel
-            loadStatistikDashboard(); // Update statistik di dashboard
+            loadStatistikDashboard(); // Update statistik
 
         } catch (error) {
-            console.error("Error saat menyimpan data mahasiswa: ", error);
-            tampilkanNotifikasiMahasiswa('❌ Gagal menyimpan data! Cek konsol.', 'alert-danger');
+            console.error("Error saat menyimpan/update data mahasiswa: ", error);
+            tampilkanNotifikasiMahasiswa('❌ Gagal menyimpan/update data! Cek konsol.', 'alert-danger');
         }
     });
 }
@@ -383,6 +388,7 @@ async function loadSemuaMK() {
             // Tombol Aksi (Hapus)
             const cellAksi = row.insertCell(3);
             cellAksi.innerHTML = `
+                <button class="btn btn-sm btn-info me-2" onclick="handleEditMK('${docId}')" style="color:white;">Edit</button>
                 <button class="btn btn-sm btn-danger me-2" onclick="handleHapusMK('${docId}')">Hapus</button>
             `;
         });
@@ -414,24 +420,33 @@ if (formMataKuliah) {
 
         tampilkanNotifikasiMK('', 'alert-danger', true); 
 
+        // Validasi
         if (!kode_mk || !nama_mk || isNaN(sks) || sks < 1 || sks > 6) {
             tampilkanNotifikasiMK('Kode, Nama MK, dan SKS (1-6) wajib diisi!', 'alert-danger');
             return;
         }
-
+        
         const dataMK = { kode_mk, nama_mk, sks };
 
         try {
+            // Proses Simpan/Update
             await dataService.simpanMK(dataMK); 
             
-            tampilkanNotifikasiMK('✅ Data Mata Kuliah berhasil disimpan/diperbarui!', 'alert-success');
-            formMataKuliah.reset();
-            loadSemuaMK(); // Muat ulang tabel (yang juga akan memuat ulang dropdown)
-            loadStatistikDashboard(); // Update statistik di dashboard
+            // Tentukan pesan sukses
+            const pesan = dataMKUntukEdit ? '✅ Data Mata Kuliah berhasil diupdate!' : '✅ Data Mata Kuliah berhasil disimpan!';
+
+            tampilkanNotifikasiMK(pesan, 'alert-success');
+            
+            // --- INI KRITIS: Reset form setelah sukses ---
+            resetFormMK(); 
+            // ----------------------------------------------
+            
+            loadSemuaMK(); 
+            loadStatistikDashboard(); 
 
         } catch (error) {
-            console.error("Error saat menyimpan data MK: ", error);
-            tampilkanNotifikasiMK('❌ Gagal menyimpan data! Cek konsol.', 'alert-danger');
+            console.error("Error saat menyimpan/update data MK: ", error);
+            tampilkanNotifikasiMK('❌ Gagal menyimpan/update data! Cek konsol.', 'alert-danger');
         }
     });
 }
@@ -513,6 +528,101 @@ async function loadStatistikDashboard() {
         
     } catch (error) {
         console.error("Gagal memuat statistik dashboard:", error);
+    }
+}
+
+// --- Di dalam js/logic.js (Tambahkan di bagian awal file) ---
+
+let dataMahasiswaUntukEdit = null; // Menyimpan data saat mode edit aktif
+
+/**
+ * Mereset formulir Mahasiswa setelah operasi.
+ */
+function resetFormMahasiswa() {
+    document.getElementById('formTitle').textContent = 'Tambah Mahasiswa Baru';
+    document.getElementById('inputNimMahasiswa').removeAttribute('readonly'); // NIM bisa diisi lagi
+    document.getElementById('btnSimpanMahasiswa').textContent = 'Simpan Data';
+    document.getElementById('formMahasiswa').reset();
+    dataMahasiswaUntukEdit = null;
+    tampilkanNotifikasiMahasiswa('', 'alert-danger', true); 
+}
+
+/**
+ * Menangani klik tombol 'Edit' Mahasiswa: memuat data ke form.
+ * @param {string} nim - NIM Mahasiswa yang akan diedit.
+ */
+async function handleEditMahasiswa(nim) {
+    tampilkanNotifikasiMahasiswa('', 'alert-danger', true);
+
+    try {
+        const data = await dataService.loadMahasiswaByNim(nim); 
+
+        if (!data) {
+            tampilkanNotifikasiMahasiswa(`Mahasiswa dengan NIM ${nim} tidak ditemukan.`, 'alert-danger');
+            return;
+        }
+
+        dataMahasiswaUntukEdit = data; 
+        
+        // Mengisi formulir
+        document.getElementById('formTitle').textContent = `Edit Data Mahasiswa: ${data.nama}`;
+        document.getElementById('inputNimMahasiswa').value = data.nim;
+        document.getElementById('inputNamaMahasiswa').value = data.nama;
+        document.getElementById('inputProdiMahasiswa').value = data.prodi;
+        
+        // Mengunci input NIM karena NIM adalah ID dokumen
+        document.getElementById('inputNimMahasiswa').setAttribute('readonly', true);
+        document.getElementById('btnSimpanMahasiswa').textContent = 'Update Data Mahasiswa';
+
+    } catch (error) {
+        console.error("Error saat memuat data untuk edit: ", error);
+        tampilkanNotifikasiMahasiswa('Gagal memuat data mahasiswa untuk edit.', 'alert-danger');
+    }
+}
+
+// --- Di dalam js/logic.js (Perbaiki bagian Mata Kuliah) ---
+
+let dataMKUntukEdit = null;
+
+function resetFormMK() {
+    // Menggunakan ID formMKTitle yang baru di HTML
+    document.getElementById('formMKTitle').textContent = 'Tambah Mata Kuliah'; 
+    document.getElementById('inputKodeMK').removeAttribute('readonly'); 
+    document.getElementById('btnSimpanMK').textContent = 'Simpan Mata Kuliah';
+    document.getElementById('formMataKuliah').reset();
+    dataMKUntukEdit = null;
+    tampilkanNotifikasiMK('', 'alert-danger', true); 
+}
+
+async function handleEditMK(kode_mk) {
+    tampilkanNotifikasiMK('', 'alert-danger', true);
+
+    try {
+        const data = await dataService.loadMKByKode(kode_mk); 
+
+        if (!data) {
+            console.error(`Data MK tidak ditemukan untuk kode: ${kode_mk}`);
+            tampilkanNotifikasiMK(`Mata Kuliah dengan kode ${kode_mk} tidak ditemukan.`, 'alert-danger');
+            return;
+        }
+
+        dataMKUntukEdit = data; 
+        
+        // --- BARIS PERBAIKAN KRITIS (Menggunakan ID formMKTitle) ---
+        document.getElementById('formMKTitle').textContent = `Edit Mata Kuliah: ${data.nama_mk}`;
+        // -----------------------------------------------------------
+        
+        document.getElementById('inputKodeMK').value = data.kode_mk;
+        document.getElementById('inputNamaMK').value = data.nama_mk;
+        document.getElementById('inputSKS').value = data.sks;         
+        
+        document.getElementById('inputKodeMK').setAttribute('readonly', true);
+        document.getElementById('btnSimpanMK').textContent = 'Update Mata Kuliah';
+
+    } catch (error) {
+        // Output error ke konsol
+        console.error("Error saat memuat data MK untuk edit: ", error); 
+        tampilkanNotifikasiMK('Gagal memuat data Mata Kuliah untuk edit. Lihat konsol.', 'alert-danger');
     }
 }
 

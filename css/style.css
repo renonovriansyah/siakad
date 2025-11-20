@@ -1,25 +1,31 @@
 /* ==========================================================
-// File: css/style.css (VERSI UPGRADE)
-// Fokus: Desain Modern, Sidebar Gelap, Kartu Berwarna
+// File: css/style.css (DARK MODE FUTURISTIK - VERSI FINAL DENGAN FIX INPUT TEXT)
+// Fokus: Memastikan Teks Input & Placeholder Terlihat Jelas (Putih)
 // ========================================================== */
 
 :root {
-    --sidebar-bg: #212529;
-    --sidebar-text: #adb5bd; /* Warna teks abu-abu terang */
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --success-color: #198754;
-    --warning-color: #ffc107;
-    --info-color: #0dcaf0;
-    --body-bg: #f8f9fa; /* Latar belakang lebih terang */
-    --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    /* Color Palette Dark Mode */
+    --main-bg: #0f172a; 
+    --card-bg: #1e293b; 
+    --sidebar-bg: #1e293b; 
+    --primary-color: #0dcaf0; 
+    --secondary-color: #fbbf24; /* KUNING TERANG untuk Label */
+    --text-color: #ffffff; /* Teks Utama Putih */
+    --placeholder-color: #94a3b8; /* Abu-abu terang untuk placeholder */
+    --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+    --table-header-bg: #334155; 
+    --table-row-hover: #475569; 
 }
 
 /* 1. STRUKTUR DASAR & BODY */
 body {
     overflow-x: hidden;
-    background-color: var(--body-bg);
+    background-color: var(--main-bg) !important; 
+    color: var(--text-color) !important;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.bg-light, .bg-white {
+    background-color: var(--card-bg) !important; 
 }
 
 #wrapper {
@@ -27,61 +33,60 @@ body {
     transition: all 0.4s ease-in-out; 
 }
 
-/* 2. SIDEBAR (Lebih Gelap & Ramping) */
+/* 2. SIDEBAR */
 #sidebar-wrapper {
     min-height: 100vh;
     width: 250px; 
     position: fixed; 
     z-index: 1000;
-    background: var(--sidebar-bg);
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    background: var(--sidebar-bg) !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.4);
     transition: margin-left 0.4s ease-in-out; 
 }
 
 .sidebar-heading {
-    /* Pastikan header sidebar menggunakan warna background yang konsisten */
     background: var(--sidebar-bg) !important; 
+    color: var(--primary-color) !important;
     font-size: 1.5rem;
-    font-weight: 600;
-    color: white !important;
-    padding: 1rem 1.5rem !important;
+    font-weight: 700;
 }
 
 /* Efek Menu Sidebar */
 .list-group-item {
     border: none !important;
     background-color: var(--sidebar-bg) !important;
-    color: var(--sidebar-text) !important;
-    padding: 0.75rem 1.5rem;
+    color: var(--secondary-color) !important;
+    padding: 0.8rem 1.5rem;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .list-group-item:hover {
-    background-color: #343a40 !important;
-    color: white !important;
+    background-color: #334155 !important;
+    color: var(--primary-color) !important;
 }
 
 .list-group-item.active {
-    background-color: var(--primary-color) !important; /* Aksen Biru */
-    color: white !important;
-    border-radius: 0 50px 50px 0; /* Membuat sudut membulat di kanan */
+    background-color: var(--primary-color) !important; 
+    color: var(--card-bg) !important; 
+    border-radius: 0 50px 50px 0; 
     margin-right: 15px;
     font-weight: 600;
+    box-shadow: 0 0 10px var(--primary-color);
 }
 
 .admin-rpl-footer {
     position: absolute;
     bottom: 0;
     width: 100%;
-    border-top: 1px solid #343a40;
+    border-top: 1px solid #334155;
 }
 
-/* 3. KONTEN UTAMA & TOGGLE */
+/* 3. KONTEN UTAMA & NAVBAR */
 #page-content-wrapper {
     width: 100%;
     margin-left: 250px; 
     transition: margin-left 0.4s ease-in-out; 
-    min-width: 0; /* Penting untuk responsivitas */
+    min-width: 0; 
 }
 
 #wrapper.toggled #sidebar-wrapper {
@@ -92,50 +97,58 @@ body {
     margin-left: 0; 
 }
 
-/* Navbar */
 .navbar {
-    border-bottom: 1px solid #dee2e6;
+    background-color: var(--card-bg) !important; 
+    border-bottom: 1px solid #334155;
 }
-.search-box input {
-    border-radius: 20px 0 0 20px !important;
-    border-right: none;
+.navbar h2, .navbar .fa-lg, .navbar .text-muted {
+    color: var(--text-color) !important; 
 }
-.search-box .input-group-text {
-    background-color: white;
-    border-radius: 0 20px 20px 0 !important;
-    border-left: none;
-    color: var(--secondary-color);
+.search-box .form-control, .search-box .input-group-text {
+    background-color: #334155;
+    border: 1px solid #475569;
+    color: var(--text-color);
 }
 
 
-/* 4. KARTU STATISTIK (Dashboard) */
-.stat-card {
+/* 4. KARTU STATISTIK & FORM */
+.card {
     border: none;
-    border-radius: 15px; /* Sudut membulat */
-    background: white;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 10px; 
+    background-color: var(--card-bg) !important; 
     box-shadow: var(--card-shadow);
+    color: var(--text-color) !important; 
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card-header, .card-body {
+    background-color: var(--card-bg) !important;
 }
 
 .stat-card:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-8px); 
+    box-shadow: 0 0 20px rgba(0, 202, 240, 0.4) !important;
+    transform: translateY(-5px); 
     cursor: pointer;
 }
 
-/* Warna Khusus untuk Kartu IPK (Paling Menonjol) */
+/* Kartu Rata-Rata IPK */
 .stat-card:nth-child(4) {
-    /* Menerapkan Gradien atau Warna Aksen */
-    background: linear-gradient(135deg, var(--warning-color), #ffdb71);
-    color: #333;
+    background: var(--card-bg) !important; 
+    color: var(--text-color) !important;
+    text-align: right !important; 
+    padding: 1rem !important; 
 }
+
+/* Menargetkan teks di dalam kartu IPK */
 .stat-card:nth-child(4) .stat-value {
-    color: #333 !important;
-    font-size: 3.5rem !important;
+    color: var(--primary-color) !important; 
+    font-size: 3rem !important;
+    font-weight: 700;
 }
-.stat-card:nth-child(4) .fa-graduation-cap {
-    color: #333 !important;
-    opacity: 0.8;
+.stat-card:nth-child(4) .fa-graduation-cap,
+.stat-card:nth-child(4) .text-muted,
+.stat-card:nth-child(4) h4 {
+     color: var(--secondary-color) !important; 
+     margin-bottom: 0.5rem;
 }
 
 .stat-value {
@@ -146,31 +159,59 @@ body {
 .card-text.text-muted {
     font-size: 0.9rem;
     text-transform: uppercase;
+    color: var(--secondary-color) !important;
+}
+.form-label {
+    color: var(--secondary-color) !important;
 }
 
-/* 5. TABLES (Di Lihat Data Nilai & Kelola) */
-.table th {
-    background-color: #e9ecef;
-    color: #495057;
-    font-weight: 600;
-    border-bottom: 2px solid #dee2e6;
+/* --- PERBAIKAN INPUT FORM KRITIS --- */
+.form-control, .form-select {
+    background-color: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: var(--text-color) !important; /* Teks yang diketik: Putih */
+}
+
+/* Mengatur warna Placeholder untuk semua browser */
+.form-control::placeholder {
+    color: var(--placeholder-color) !important; /* Placeholder: Abu-abu terang */
+    opacity: 1; /* Memastikan opacity 1 agar warna muncul */
+}
+.form-control::-webkit-input-placeholder {
+    color: var(--placeholder-color) !important; 
+}
+.form-control:-ms-input-placeholder {
+    color: var(--placeholder-color) !important; 
+}
+
+
+/* 5. TABLES */
+.table {
+    color: var(--text-color) !important; 
+}
+.table-hover > tbody > tr {
+    background-color: var(--card-bg) !important; 
 }
 .table td {
     vertical-align: middle;
+    border-color: #475569 !important; 
 }
 
-/* 6. RESPONSIVITAS */
-@media (max-width: 768px) {
-    #sidebar-wrapper {
-        margin-left: -250px;
-    }
-    #page-content-wrapper {
-        margin-left: 0;
-    }
-    #wrapper.toggled #sidebar-wrapper {
-        margin-left: 0;
-    }
-    #wrapper.toggled #page-content-wrapper {
-        margin-left: 250px;
-    }
+.table th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    border-bottom: 2px solid #334155;
+}
+
+
+/* EFEK HOVER PADA BARIS TABEL */
+.table-striped > tbody > tr {
+    transition: background-color 0.3s ease;
+}
+.table-hover > tbody > tr:hover,
+.table-striped > tbody > tr:hover {
+    background-color: var(--table-row-hover) !important; 
+    transform: scale(1.005);
+    box-shadow: 0 0 5px rgba(0, 202, 240, 0.2); 
 }

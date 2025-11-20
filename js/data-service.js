@@ -92,6 +92,15 @@ const dataService = {
     hapusDokumen: async (collectionName, docId) => {
         return await db.collection(collectionName).doc(docId).delete();
     },
+    loadMahasiswaByNim: async (nim) => { 
+    const doc = await db.collection(COLLECTION_MAHASISWA).doc(nim).get(); 
+    return doc.exists ? doc.data() : null; 
+    },
+    loadMKByKode: async (kode_mk) => { 
+    // Kode MK adalah ID dokumen
+    const doc = await db.collection(COLLECTION_MK).doc(kode_mk).get(); 
+    return doc.exists ? doc.data() : null; 
+    },
 
     // --- CRUD MAHASISWA & MK & STATISTIK ---
     simpanMahasiswa: async (data) => { /* ... */ return await db.collection(COLLECTION_MAHASISWA).doc(data.nim).set(data); },
