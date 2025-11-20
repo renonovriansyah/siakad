@@ -1,39 +1,89 @@
 /* ==========================================================
-// File: css/style.css
-// Fungsi: Layout, Transisi Sidebar, Hover Cards
+// File: css/style.css (VERSI UPGRADE)
+// Fokus: Desain Modern, Sidebar Gelap, Kartu Berwarna
 // ========================================================== */
 
 :root {
     --sidebar-bg: #212529;
-    --card-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --sidebar-text: #adb5bd; /* Warna teks abu-abu terang */
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --body-bg: #f8f9fa; /* Latar belakang lebih terang */
+    --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 }
 
-/* Struktur Dasar dan Transisi Sidebar (PENTING UNTUK LAYOUT) */
+/* 1. STRUKTUR DASAR & BODY */
 body {
     overflow-x: hidden;
-    background-color: #f4f7f6;
+    background-color: var(--body-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 #wrapper {
-    display: flex; /* Memastikan sidebar dan konten berdampingan */
-    transition: all 0.5s ease; 
+    display: flex; 
+    transition: all 0.4s ease-in-out; 
 }
 
+/* 2. SIDEBAR (Lebih Gelap & Ramping) */
 #sidebar-wrapper {
     min-height: 100vh;
     width: 250px; 
-    position: fixed; /* Membuat sidebar tetap di kiri */
+    position: fixed; 
     z-index: 1000;
-    transition: margin-left 0.5s ease; 
+    background: var(--sidebar-bg);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: margin-left 0.4s ease-in-out; 
 }
 
+.sidebar-heading {
+    /* Pastikan header sidebar menggunakan warna background yang konsisten */
+    background: var(--sidebar-bg) !important; 
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Efek Menu Sidebar */
+.list-group-item {
+    border: none !important;
+    background-color: var(--sidebar-bg) !important;
+    color: var(--sidebar-text) !important;
+    padding: 0.75rem 1.5rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+.list-group-item.active {
+    background-color: var(--primary-color) !important; /* Aksen Biru */
+    color: white !important;
+    border-radius: 0 50px 50px 0; /* Membuat sudut membulat di kanan */
+    margin-right: 15px;
+    font-weight: 600;
+}
+
+.admin-rpl-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #343a40;
+}
+
+/* 3. KONTEN UTAMA & TOGGLE */
 #page-content-wrapper {
     width: 100%;
-    margin-left: 250px; /* Konten dimulai setelah lebar sidebar */
-    transition: margin-left 0.5s ease; 
+    margin-left: 250px; 
+    transition: margin-left 0.4s ease-in-out; 
+    min-width: 0; /* Penting untuk responsivitas */
 }
 
-/* KETIKA SIDEBAR SEMBUNYI (Toggled) */
 #wrapper.toggled #sidebar-wrapper {
     margin-left: -250px; 
 }
@@ -42,34 +92,85 @@ body {
     margin-left: 0; 
 }
 
-/* Efek Hover Sidebar Menu */
-.list-group-item {
-    border: none !important;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+/* Navbar */
+.navbar {
+    border-bottom: 1px solid #dee2e6;
+}
+.search-box input {
+    border-radius: 20px 0 0 20px !important;
+    border-right: none;
+}
+.search-box .input-group-text {
+    background-color: white;
+    border-radius: 0 20px 20px 0 !important;
+    border-left: none;
+    color: var(--secondary-color);
 }
 
-.list-group-item:hover {
-    background-color: #343a40 !important;
-    transform: translateX(5px);
-}
 
-/* Efek Hover Card Statistik */
+/* 4. KARTU STATISTIK (Dashboard) */
 .stat-card {
-    border-left: 5px solid transparent;
-    transition: all 0.3s ease; 
-    border-radius: 10px;
-    cursor: pointer;
+    border: none;
+    border-radius: 15px; /* Sudut membulat */
+    background: white;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: var(--card-shadow);
 }
 
 .stat-card:hover {
-    border-left-color: #0d6efd;
-    box-shadow: var(--card-hover-shadow) !important;
-    transform: translateY(-5px); 
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-8px); 
+    cursor: pointer;
 }
 
-.admin-rpl-footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid #343a40;
+/* Warna Khusus untuk Kartu IPK (Paling Menonjol) */
+.stat-card:nth-child(4) {
+    /* Menerapkan Gradien atau Warna Aksen */
+    background: linear-gradient(135deg, var(--warning-color), #ffdb71);
+    color: #333;
+}
+.stat-card:nth-child(4) .stat-value {
+    color: #333 !important;
+    font-size: 3.5rem !important;
+}
+.stat-card:nth-child(4) .fa-graduation-cap {
+    color: #333 !important;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+.card-text.text-muted {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+/* 5. TABLES (Di Lihat Data Nilai & Kelola) */
+.table th {
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+.table td {
+    vertical-align: middle;
+}
+
+/* 6. RESPONSIVITAS */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: -250px;
+    }
+    #page-content-wrapper {
+        margin-left: 0;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: 250px;
+    }
 }
